@@ -285,7 +285,7 @@
 
   /* Service indicators */
   .svc-yes { color: #22c55e; font-size: 15px; font-weight: 600; }
-  .svc-no  { color: #334155; }
+  .svc-no  { color: #475569; font-size: 12px; }
   .td-center { text-align: center; }
 
   /* Account cell */
@@ -349,11 +349,50 @@
     border-color: rgba(99,102,241,0.5);
   }
   .edit-field select { min-width: 130px; cursor: pointer; }
+  .edit-field input[type="text"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 13px;
+    padding: 6px 10px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 200px;
+  }
+  .edit-field input[type="text"]:focus {
+    border-color: rgba(99,102,241,0.5);
+  }
+  .edit-field input[type="text"]::placeholder { color: #475569; }
   .edit-field textarea {
     min-width: 260px;
     min-height: 60px;
     resize: vertical;
   }
+  .project-url {
+    font-size: 11px;
+    color: #60a5fa;
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .project-url:hover { color: #93bbfc; text-decoration: underline; }
+  .edit-delete-btn {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #f87171;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    margin-left: auto;
+    align-self: flex-end;
+  }
+  .edit-delete-btn:hover { background: rgba(239,68,68,0.2); }
   .edit-accounts-title {
     font-size: 10px;
     font-weight: 600;
@@ -405,6 +444,110 @@
   }
   .help-btn:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
   .help-btn.active { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.3); color: #a5b4fc; }
+
+  .add-btn {
+    background: rgba(16,185,129,0.15);
+    color: #6ee7b7;
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: rgba(16,185,129,0.25); }
+
+  /* ── Add Project Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1a1f2e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    width: 420px;
+    max-width: 90vw;
+  }
+  .modal h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 16px;
+  }
+  .modal-field {
+    margin-bottom: 12px;
+  }
+  .modal-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  .modal-field input,
+  .modal-field select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 13px;
+    padding: 8px 10px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal-field input:focus,
+  .modal-field select:focus {
+    border-color: rgba(99,102,241,0.5);
+  }
+  .modal-field input::placeholder { color: #475569; }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 18px;
+  }
+  .modal-actions button {
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .modal-cancel {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+  }
+  .modal-cancel:hover { background: rgba(255,255,255,0.1); }
+  .modal-save {
+    background: rgba(16,185,129,0.2);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #6ee7b7;
+  }
+  .modal-save:hover { background: rgba(16,185,129,0.3); }
+  .modal-save:disabled { opacity: 0.4; cursor: not-allowed; }
+  .modal-error {
+    font-size: 12px;
+    color: #f87171;
+    margin-top: 4px;
+    display: none;
+  }
 
   .portfolio-btn {
     background: rgba(139,92,246,0.15);
@@ -510,6 +653,42 @@
   .help-tab-content { display: none; }
   .help-tab-content.active { display: block; }
 
+  /* ── View Tabs ── */
+  .view-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 2px;
+    margin-right: 8px;
+  }
+  .view-tab {
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: transparent;
+    color: #64748b;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .view-tab:hover { color: #94a3b8; }
+  .view-tab.active { color: #e2e8f0; background: rgba(255,255,255,0.08); }
+
+  /* ── Emerald Link Tab ── */
+  .view-tab.emerald-tab {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .view-tab.emerald-tab .ext-icon {
+    font-size: 10px;
+    opacity: 0.5;
+  }
+
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .top-bar { flex-wrap: wrap; padding: 12px 16px; }
@@ -529,7 +708,12 @@
   <span class="scan-date" id="scan-date"></span>
   <span id="save-indicator">Saved &#10003;</span>
   <div class="spacer"></div>
+  <div class="view-tabs">
+    <button class="view-tab active" data-view="dashboard">Projects</button>
+    <button class="view-tab emerald-tab" data-view="emerald">Emerald <span class="ext-icon">&#8599;</span></button>
+  </div>
   <input type="text" id="search" placeholder="&#128269; Search...">
+  <button class="add-btn" id="add-btn">+ Add Project</button>
   <button class="portfolio-btn" id="portfolio-btn">&#9998; Update Portfolio</button>
   <button id="rescan-btn">&#128260; Re-scan</button>
   <button class="help-btn" id="help-btn" title="Help & Decommission Guides">?</button>
@@ -554,11 +738,14 @@
 
     <h3>Managing Projects</h3>
     <ul>
-      <li><strong>Click any row</strong> to expand the edit panel — change status, type, notes, and account assignments</li>
-      <li><strong>Search</strong> by project name, package name, or notes</li>
+      <li><strong>Click any row</strong> to expand the edit panel — change status, type, URL, notes, and account assignments</li>
+      <li><strong>+ Add Project</strong> to manually add projects that aren't in your filesystem (websites, external tools, etc.)</li>
+      <li><strong>URL / Domain</strong> — add a URL to any project and it'll show as a clickable link under the name</li>
+      <li><strong>Search</strong> by project name, package name, URL, or notes</li>
       <li><strong>Filter</strong> by status (Active/Paused/Archived) or type (Mobile/Web App/etc.)</li>
       <li><strong>Sort</strong> by clicking any column header (click again to reverse)</li>
       <li><strong>Re-scan</strong> when you add/remove project directories — picks up new projects automatically</li>
+      <li><strong>Remove</strong> manually-added projects via the delete button in the edit panel (scanner-detected projects can't be removed)</li>
     </ul>
 
     <h3>Accounts</h3>
@@ -725,6 +912,49 @@
   </div>
 </div>
 
+<!-- Add Project Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <h3>Add New Project</h3>
+    <div class="modal-field">
+      <label>Project Name *</label>
+      <input type="text" id="add-name" placeholder="e.g. argu-website">
+      <div class="modal-error" id="add-name-error">A project with this name already exists</div>
+    </div>
+    <div class="modal-field">
+      <label>Type</label>
+      <select id="add-type">
+        <option value="">Unset</option>
+        <option value="mobile">Mobile</option>
+        <option value="webapp">Web App</option>
+        <option value="website">Website</option>
+        <option value="backend">Backend</option>
+        <option value="library">Library</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Status</label>
+      <select id="add-status">
+        <option value="active">Active</option>
+        <option value="paused">Paused</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>URL / Domain</label>
+      <input type="text" id="add-url" placeholder="e.g. argu.pro">
+    </div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <input type="text" id="add-notes" placeholder="Short description...">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="add-cancel">Cancel</button>
+      <button class="modal-save" id="add-save" disabled>Add Project</button>
+    </div>
+  </div>
+</div>
+
 <!-- Filters -->
 <div class="filters">
   <span class="filter-pill active" data-filter-status="all">All</span>
@@ -820,6 +1050,10 @@ function getProjectNotes(key) {
   return userData.projects[key]?.notes || '';
 }
 
+function getProjectUrl(key) {
+  return userData.projects[key]?.url || '';
+}
+
 function getProjectAccounts(key) {
   return userData.projects[key]?.accounts || {};
 }
@@ -832,7 +1066,7 @@ function getAccountColor(email) {
 
 // ── Service check ──
 function svcHtml(val) {
-  return val ? '<span class="svc-yes">&#10003;</span>' : '<span class="svc-no">&mdash;</span>';
+  return val ? '<span class="svc-yes">&#10003;</span>' : '<span class="svc-no">??</span>';
 }
 
 // ── Get filtered + sorted entries ──
@@ -844,9 +1078,11 @@ function getEntries() {
     const q = filters.search.toLowerCase();
     entries = entries.filter(([key, p]) => {
       const notes = getProjectNotes(key);
+      const url = getProjectUrl(key);
       return key.toLowerCase().includes(q)
         || (p.packageName || '').toLowerCase().includes(q)
-        || notes.toLowerCase().includes(q);
+        || notes.toLowerCase().includes(q)
+        || url.toLowerCase().includes(q);
     });
   }
 
@@ -941,6 +1177,7 @@ function render() {
     const type = getProjectType(key, project);
     const status = getProjectStatus(key);
     const notes = getProjectNotes(key);
+    const url = getProjectUrl(key);
     const accounts = getProjectAccounts(key);
     const s = project.services || {};
 
@@ -949,7 +1186,7 @@ function render() {
     tr.dataset.key = key;
 
     // Build account display
-    let accountHtml = '<span class="svc-no">&mdash;</span>';
+    let accountHtml = '<span class="svc-no">??</span>';
     const defaultAcct = accounts.default;
     const specificAccts = Object.entries(accounts).filter(([k]) => k !== 'default');
     if (defaultAcct) {
@@ -963,22 +1200,30 @@ function render() {
     }
 
     // Type badge
-    let typeHtml = '<span class="badge-type badge-type-unset">&mdash;</span>';
+    let typeHtml = '<span class="badge-type badge-type-unset">??</span>';
     if (type) {
       typeHtml = `<span class="badge-type badge-type-${type}">${TYPE_LABELS[type] || type}</span>`;
     }
 
     // Status badge
-    let statusHtml = '<span class="badge-status badge-status-unset">&mdash;</span>';
+    let statusHtml = '<span class="badge-status badge-status-unset">??</span>';
     if (status) {
       const label = status.charAt(0).toUpperCase() + status.slice(1);
       statusHtml = `<span class="badge-status badge-status-${status}">${label}</span>`;
+    }
+
+    // URL display
+    let urlHtml = '';
+    if (url) {
+      const href = url.startsWith('http') ? url : 'https://' + url;
+      urlHtml = `<a class="project-url" href="${href}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${url}</a>`;
     }
 
     tr.innerHTML = `
       <td>
         <div class="project-name">${key}</div>
         ${project.packageName && project.packageName !== key ? `<div class="package-name">${project.packageName}</div>` : ''}
+        ${urlHtml}
       </td>
       <td>${typeHtml}</td>
       <td>${statusHtml}</td>
@@ -990,7 +1235,7 @@ function render() {
       <td class="td-center">${svcHtml(s.cloudflare)}</td>
       <td class="td-center">${svcHtml(s.netlify)}</td>
       <td>${accountHtml}</td>
-      <td><span class="notes-text">${notes || '<span class="svc-no">&mdash;</span>'}</span></td>
+      <td><span class="notes-text">${notes || '<span class="svc-no">??</span>'}</span></td>
     `;
 
     tr.addEventListener('click', () => {
@@ -1038,6 +1283,9 @@ function render() {
         `;
       }
 
+      // Determine if this is a user-only project (manually added, no scanner path)
+      const isManualProject = !project.path;
+
       editTd.innerHTML = `
         <div class="edit-inner">
           <div class="edit-field">
@@ -1061,10 +1309,15 @@ function render() {
             </select>
           </div>
           <div class="edit-field">
+            <label>URL / Domain</label>
+            <input type="text" data-field="url" value="${url}" placeholder="e.g. myproject.com">
+          </div>
+          <div class="edit-field">
             <label>Notes</label>
             <textarea data-field="notes">${notes}</textarea>
           </div>
           ${accountsHtml}
+          ${isManualProject ? '<button class="edit-delete-btn" data-delete="true">Remove Project</button>' : ''}
         </div>
       `;
 
@@ -1090,6 +1343,31 @@ function render() {
         ta.addEventListener('click', e => e.stopPropagation());
         ta.addEventListener('keydown', e => e.stopPropagation());
       });
+
+      editTd.querySelectorAll('input[data-field="url"]').forEach(inp => {
+        inp.addEventListener('blur', () => {
+          if (!userData.projects[key]) userData.projects[key] = { status: null, type: null, notes: '', accounts: {} };
+          userData.projects[key].url = inp.value || '';
+          saveUserData();
+          render();
+        });
+        inp.addEventListener('click', e => e.stopPropagation());
+        inp.addEventListener('keydown', e => e.stopPropagation());
+      });
+
+      const deleteBtn = editTd.querySelector('[data-delete]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm(`Remove "${key}" from the dashboard?`)) {
+            delete userData.projects[key];
+            delete appData.projects[key];
+            expandedRow = null;
+            saveUserData();
+            render();
+          }
+        });
+      }
 
       editTd.querySelectorAll('select[data-account]').forEach(sel => {
         const acctKey = sel.dataset.account;
@@ -1154,6 +1432,7 @@ async function loadData() {
       if (project.status) up.status = project.status;
       if (project.type) up.type = project.type;
       if (project.notes !== undefined && project.notes !== null) up.notes = project.notes || '';
+      if (project.url) up.url = project.url;
       if (project.accounts) up.accounts = project.accounts || {};
       if (Object.keys(up).length > 0) userData.projects[key] = up;
     }
@@ -1228,6 +1507,7 @@ document.getElementById('rescan-btn').addEventListener('click', async () => {
         if (project.status) up.status = project.status;
         if (project.type) up.type = project.type;
         if (project.notes !== undefined) up.notes = project.notes || '';
+        if (project.url) up.url = project.url;
         if (project.accounts) up.accounts = project.accounts;
         if (Object.keys(up).length > 0) userData.projects[key] = up;
       }
@@ -1277,6 +1557,90 @@ document.getElementById('portfolio-btn').addEventListener('click', async () => {
     btn.textContent = '\u270E Update Portfolio';
     btn.disabled = false;
   }
+});
+
+// ── Add Project Modal ──
+const addModal = document.getElementById('add-modal');
+const addName = document.getElementById('add-name');
+const addNameError = document.getElementById('add-name-error');
+const addSaveBtn = document.getElementById('add-save');
+
+document.getElementById('add-btn').addEventListener('click', () => {
+  addModal.classList.add('open');
+  addName.value = '';
+  document.getElementById('add-type').value = '';
+  document.getElementById('add-status').value = 'active';
+  document.getElementById('add-url').value = '';
+  document.getElementById('add-notes').value = '';
+  addNameError.style.display = 'none';
+  addSaveBtn.disabled = true;
+  setTimeout(() => addName.focus(), 100);
+});
+
+document.getElementById('add-cancel').addEventListener('click', () => {
+  addModal.classList.remove('open');
+});
+
+addModal.addEventListener('click', (e) => {
+  if (e.target === addModal) addModal.classList.remove('open');
+});
+
+addName.addEventListener('input', () => {
+  const name = addName.value.trim();
+  if (!name) {
+    addSaveBtn.disabled = true;
+    addNameError.style.display = 'none';
+    return;
+  }
+  if (appData.projects[name] || userData.projects[name]) {
+    addNameError.style.display = 'block';
+    addSaveBtn.disabled = true;
+  } else {
+    addNameError.style.display = 'none';
+    addSaveBtn.disabled = false;
+  }
+});
+
+addSaveBtn.addEventListener('click', () => {
+  const name = addName.value.trim();
+  if (!name) return;
+
+  const type = document.getElementById('add-type').value || null;
+  const status = document.getElementById('add-status').value || 'active';
+  const url = document.getElementById('add-url').value.trim();
+  const notes = document.getElementById('add-notes').value.trim();
+
+  // Add to userData
+  userData.projects[name] = {
+    status,
+    type,
+    notes,
+    url: url || '',
+    accounts: {}
+  };
+
+  // Also add to appData so it shows immediately
+  appData.projects[name] = {
+    path: null,
+    packageName: null,
+    services: {},
+    envVars: [],
+    status,
+    type,
+    notes,
+    url: url || '',
+    accounts: {}
+  };
+
+  saveUserData();
+  addModal.classList.remove('open');
+  expandedRow = name;
+  render();
+});
+
+// ── Emerald Tab (opens in new window) ──
+document.querySelector('.view-tab[data-view="emerald"]').addEventListener('click', () => {
+  window.open('https://emerald-app-ten.vercel.app/', '_blank');
 });
 </script>
 </body>
