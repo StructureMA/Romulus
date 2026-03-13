@@ -47,6 +47,14 @@
     color: #475569;
     white-space: nowrap;
   }
+  #save-indicator {
+    font-size: 12px;
+    color: #22c55e;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+    font-weight: 500;
+  }
   .spacer { flex: 1; }
   #search {
     background: rgba(255,255,255,0.05);
@@ -64,6 +72,20 @@
     background: rgba(255,255,255,0.07);
   }
   #search::placeholder { color: #475569; }
+  #rescan-btn {
+    background: rgba(59,130,246,0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  #rescan-btn:hover { background: rgba(59,130,246,0.25); }
+  #rescan-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── Filters ── */
   .filters {
@@ -209,6 +231,7 @@
   }
   tbody tr {
     border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
     transition: background 0.15s;
   }
   tbody tr:hover { background: rgba(255,255,255,0.03); }
@@ -281,6 +304,89 @@
     text-overflow: ellipsis;
   }
 
+  /* ── Expanded row + Edit Panel ── */
+  tbody tr.expanded { background: rgba(255,255,255,0.04); }
+  tbody tr.expanded td:first-child { background: #151a24; }
+  .edit-panel td {
+    padding: 0;
+    background: #131720;
+  }
+  .edit-panel:hover td { background: #131720; }
+  .edit-panel td:first-child { background: #131720; }
+  .edit-inner {
+    display: flex;
+    gap: 20px;
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .edit-field label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+  }
+  .edit-field select,
+  .edit-field textarea {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 13px;
+    padding: 6px 10px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .edit-field select:focus,
+  .edit-field textarea:focus {
+    border-color: rgba(99,102,241,0.5);
+  }
+  .edit-field select { min-width: 130px; cursor: pointer; }
+  .edit-field textarea {
+    min-width: 260px;
+    min-height: 60px;
+    resize: vertical;
+  }
+  .edit-accounts-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  .edit-account-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .edit-account-row .svc-label {
+    font-size: 11px;
+    color: #94a3b8;
+    min-width: 70px;
+    text-transform: capitalize;
+  }
+  .edit-account-row select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 12px;
+    padding: 4px 8px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+  }
+
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .top-bar { flex-wrap: wrap; padding: 12px 16px; }
@@ -298,8 +404,10 @@
   <span class="title">&#8984; Command Center</span>
   <span class="badge" id="project-count">0 projects</span>
   <span class="scan-date" id="scan-date"></span>
+  <span id="save-indicator">Saved &#10003;</span>
   <div class="spacer"></div>
   <input type="text" id="search" placeholder="&#128269; Search...">
+  <button id="rescan-btn">&#128260; Re-scan</button>
 </div>
 
 <!-- Filters -->
@@ -366,6 +474,7 @@ let userData = { accounts: [], projects: {} };
 let filters = { status: 'all', type: 'all', search: '' };
 let sortCol = 'name';
 let sortDir = 'asc';
+let expandedRow = null;
 
 // ── Type detection ──
 const TYPE_LABELS = {
@@ -521,6 +630,8 @@ function render() {
     const s = project.services || {};
 
     const tr = document.createElement('tr');
+    if (expandedRow === key) tr.classList.add('expanded');
+    tr.dataset.key = key;
 
     // Build account display
     let accountHtml = '<span class="svc-no">&mdash;</span>';
@@ -567,8 +678,151 @@ function render() {
       <td><span class="notes-text">${notes || '<span class="svc-no">&mdash;</span>'}</span></td>
     `;
 
+    tr.addEventListener('click', () => {
+      expandedRow = expandedRow === key ? null : key;
+      render();
+    });
+
     tbody.appendChild(tr);
+
+    // Edit panel
+    if (expandedRow === key) {
+      const editTr = document.createElement('tr');
+      editTr.className = 'edit-panel';
+      const editTd = document.createElement('td');
+      editTd.colSpan = 12;
+
+      const serviceNames = Object.keys(s);
+
+      let accountsHtml = '';
+      if (serviceNames.length > 0) {
+        const accountOpts = appData.accounts.map(a =>
+          `<option value="${a.email}">${a.email} (${a.label})</option>`
+        ).join('');
+
+        accountsHtml = `
+          <div class="edit-field" style="min-width:240px">
+            <div class="edit-accounts-title">Accounts</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span class="svc-label" style="min-width:70px">Default</span>
+              <select data-account="default">
+                <option value="">None</option>
+                ${accountOpts}
+              </select>
+            </div>
+            ${serviceNames.map(svc => `
+              <div class="edit-account-row">
+                <span class="svc-label">${svc}</span>
+                <select data-account="${svc}">
+                  <option value="">Use default</option>
+                  ${accountOpts}
+                </select>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      editTd.innerHTML = `
+        <div class="edit-inner">
+          <div class="edit-field">
+            <label>Status</label>
+            <select data-field="status">
+              <option value="">Unset</option>
+              <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
+              <option value="paused" ${status === 'paused' ? 'selected' : ''}>Paused</option>
+              <option value="archived" ${status === 'archived' ? 'selected' : ''}>Archived</option>
+            </select>
+          </div>
+          <div class="edit-field">
+            <label>Type</label>
+            <select data-field="type">
+              <option value="">Auto-detect</option>
+              <option value="mobile" ${type === 'mobile' ? 'selected' : ''}>Mobile</option>
+              <option value="webapp" ${type === 'webapp' ? 'selected' : ''}>Web App</option>
+              <option value="website" ${type === 'website' ? 'selected' : ''}>Website</option>
+              <option value="backend" ${type === 'backend' ? 'selected' : ''}>Backend</option>
+              <option value="library" ${type === 'library' ? 'selected' : ''}>Library</option>
+            </select>
+          </div>
+          <div class="edit-field">
+            <label>Notes</label>
+            <textarea data-field="notes">${notes}</textarea>
+          </div>
+          ${accountsHtml}
+        </div>
+      `;
+
+      // Wire up change handlers
+      editTd.querySelectorAll('select[data-field]').forEach(sel => {
+        sel.addEventListener('change', (e) => {
+          e.stopPropagation();
+          if (!userData.projects[key]) userData.projects[key] = { status: null, type: null, notes: '', accounts: {} };
+          userData.projects[key][sel.dataset.field] = sel.value || null;
+          saveUserData();
+          render();
+        });
+        sel.addEventListener('click', e => e.stopPropagation());
+      });
+
+      editTd.querySelectorAll('textarea[data-field]').forEach(ta => {
+        ta.addEventListener('blur', () => {
+          if (!userData.projects[key]) userData.projects[key] = { status: null, type: null, notes: '', accounts: {} };
+          userData.projects[key].notes = ta.value;
+          saveUserData();
+          render();
+        });
+        ta.addEventListener('click', e => e.stopPropagation());
+        ta.addEventListener('keydown', e => e.stopPropagation());
+      });
+
+      editTd.querySelectorAll('select[data-account]').forEach(sel => {
+        const acctKey = sel.dataset.account;
+        const currentAccounts = getProjectAccounts(key);
+        sel.value = currentAccounts[acctKey] || '';
+        sel.addEventListener('change', (e) => {
+          e.stopPropagation();
+          if (!userData.projects[key]) userData.projects[key] = { status: null, type: null, notes: '', accounts: {} };
+          if (!userData.projects[key].accounts) userData.projects[key].accounts = {};
+          if (sel.value) {
+            userData.projects[key].accounts[acctKey] = sel.value;
+          } else {
+            delete userData.projects[key].accounts[acctKey];
+          }
+          saveUserData();
+          render();
+        });
+        sel.addEventListener('click', e => e.stopPropagation());
+      });
+
+      editTr.appendChild(editTd);
+      editTr.addEventListener('click', e => e.stopPropagation());
+      tbody.appendChild(editTr);
+    }
   });
+}
+
+// ── Save ──
+async function saveUserData() {
+  const indicator = document.getElementById('save-indicator');
+  indicator.textContent = 'Saving...';
+  indicator.style.opacity = '1';
+  try {
+    await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    indicator.textContent = 'Saved \u2713';
+    setTimeout(() => { indicator.style.opacity = '0'; }, 1500);
+  } catch (err) {
+    indicator.textContent = 'Save failed';
+    indicator.style.color = '#ef4444';
+    setTimeout(() => {
+      indicator.style.opacity = '0';
+      indicator.style.color = '#22c55e';
+    }, 2000);
+  }
 }
 
 // ── Load data ──
@@ -641,6 +895,34 @@ document.querySelectorAll('.filter-pill[data-filter-type]').forEach(pill => {
     }
     render();
   });
+});
+
+// ── Re-scan ──
+document.getElementById('rescan-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('rescan-btn');
+  btn.textContent = '\u23F3 Scanning...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/scan', { method: 'POST' });
+    const data = await res.json();
+    appData = data;
+    // Re-extract userData from merged data
+    for (const [key, project] of Object.entries(appData.projects)) {
+      if (!userData.projects[key]) {
+        const up = {};
+        if (project.status) up.status = project.status;
+        if (project.type) up.type = project.type;
+        if (project.notes !== undefined) up.notes = project.notes || '';
+        if (project.accounts) up.accounts = project.accounts;
+        if (Object.keys(up).length > 0) userData.projects[key] = up;
+      }
+    }
+    render();
+  } catch (err) {
+    console.error('Scan failed:', err);
+  }
+  btn.textContent = '\uD83D\uDD04 Re-scan';
+  btn.disabled = false;
 });
 </script>
 </body>
