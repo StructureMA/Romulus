@@ -387,6 +387,129 @@
     min-width: 180px;
   }
 
+  /* ── Help Panel ── */
+  .help-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #94a3b8;
+    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  .help-btn:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+  .help-btn.active { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.3); color: #a5b4fc; }
+
+  .portfolio-btn {
+    background: rgba(139,92,246,0.15);
+    color: #c4b5fd;
+    border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .portfolio-btn:hover { background: rgba(139,92,246,0.25); }
+  .portfolio-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .help-panel {
+    display: none;
+    background: #131720;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 20px 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .help-panel.open { display: block; }
+  .help-panel h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin: 20px 0 10px;
+  }
+  .help-panel h3:first-child { margin-top: 0; }
+  .help-panel p, .help-panel li {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.7;
+  }
+  .help-panel ul { padding-left: 20px; }
+  .help-panel li { margin-bottom: 4px; }
+  .help-panel code {
+    background: rgba(255,255,255,0.06);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #e2e8f0;
+    font-family: 'SF Mono', SFMono-Regular, Menlo, monospace;
+  }
+  .help-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .help-section summary {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .help-section summary::-webkit-details-marker { display: none; }
+  .help-section summary::before { content: '▸'; color: #64748b; font-size: 11px; transition: transform 0.15s; }
+  .help-section[open] summary::before { transform: rotate(90deg); }
+  .help-section .decom-steps {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .help-section .decom-steps ol {
+    padding-left: 20px;
+  }
+  .help-section .decom-steps li {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    line-height: 1.6;
+  }
+  .help-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 8px;
+  }
+  .help-tab {
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: #64748b;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .help-tab:hover { color: #94a3b8; }
+  .help-tab.active { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+  .help-tab-content { display: none; }
+  .help-tab-content.active { display: block; }
+
   /* ── Responsive ── */
   @media (max-width: 768px) {
     .top-bar { flex-wrap: wrap; padding: 12px 16px; }
@@ -407,7 +530,199 @@
   <span id="save-indicator">Saved &#10003;</span>
   <div class="spacer"></div>
   <input type="text" id="search" placeholder="&#128269; Search...">
+  <button class="portfolio-btn" id="portfolio-btn">&#9998; Update Portfolio</button>
   <button id="rescan-btn">&#128260; Re-scan</button>
+  <button class="help-btn" id="help-btn" title="Help & Decommission Guides">?</button>
+</div>
+
+<!-- Help Panel -->
+<div class="help-panel" id="help-panel">
+  <div class="help-tabs">
+    <button class="help-tab active" data-tab="usage">Usage Guide</button>
+    <button class="help-tab" data-tab="decom">Decommission Projects</button>
+    <button class="help-tab" data-tab="portfolio">Portfolio Updates</button>
+  </div>
+
+  <!-- Usage Guide Tab -->
+  <div class="help-tab-content active" id="tab-usage">
+    <h3>Getting Started</h3>
+    <ul>
+      <li>Type <code>dash</code> in any terminal to open this dashboard</li>
+      <li>The server runs automatically on login via macOS LaunchAgent (port 3333)</li>
+      <li>Data auto-saves — no need to manually save anything</li>
+    </ul>
+
+    <h3>Managing Projects</h3>
+    <ul>
+      <li><strong>Click any row</strong> to expand the edit panel — change status, type, notes, and account assignments</li>
+      <li><strong>Search</strong> by project name, package name, or notes</li>
+      <li><strong>Filter</strong> by status (Active/Paused/Archived) or type (Mobile/Web App/etc.)</li>
+      <li><strong>Sort</strong> by clicking any column header (click again to reverse)</li>
+      <li><strong>Re-scan</strong> when you add/remove project directories — picks up new projects automatically</li>
+    </ul>
+
+    <h3>Accounts</h3>
+    <ul>
+      <li>Each project can have a <strong>default account</strong> and <strong>per-service overrides</strong></li>
+      <li>Example: Portfolio uses <code>jonmlucia@gmail.com</code> for Vercel but <code>structma@yahoo.com</code> for Cloudflare</li>
+      <li>To add a new account, edit <code>~/project-dashboard/user-data.json</code> and add to the <code>accounts</code> array</li>
+    </ul>
+
+    <h3>Files</h3>
+    <ul>
+      <li><code>~/project-dashboard/projects-data.json</code> — auto-generated by scanner (overwritten on re-scan)</li>
+      <li><code>~/project-dashboard/user-data.json</code> — your edits (never touched by scanner)</li>
+      <li><code>~/project-dashboard/scanner.mjs</code> — the filesystem crawler</li>
+      <li><code>~/project-dashboard/server.mjs</code> — Express server on port 3333</li>
+    </ul>
+
+    <h3>CLI Commands</h3>
+    <ul>
+      <li><code>dash</code> — open dashboard in browser</li>
+      <li><code>cd ~/project-dashboard && node scanner.mjs</code> — re-scan from CLI</li>
+      <li><code>launchctl stop com.jonathanlucia.command-center</code> — stop the server</li>
+      <li><code>launchctl start com.jonathanlucia.command-center</code> — start the server</li>
+    </ul>
+  </div>
+
+  <!-- Decommission Tab -->
+  <div class="help-tab-content" id="tab-decom">
+    <p style="margin-bottom:14px; color: #64748b;">Step-by-step guides for cleaning up each service when decommissioning a project. Expand the relevant service(s) below.</p>
+
+    <details class="help-section">
+      <summary>GitHub — Archive or Delete Repo</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Go to the repo on github.com → <strong>Settings</strong> (bottom of sidebar)</li>
+          <li>To <strong>archive</strong> (recommended): Scroll to "Danger Zone" → "Archive this repository" → Confirm</li>
+          <li>To <strong>delete</strong>: Scroll to "Danger Zone" → "Delete this repository" → Type the repo name to confirm</li>
+          <li>Locally: <code>rm -rf ~/project-name</code> (or just leave it, it won't hurt anything)</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Vercel — Remove Project</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Log in at <strong>vercel.com</strong> with the correct account (check the Account column!)</li>
+          <li>Go to the project → <strong>Settings</strong> → scroll to bottom</li>
+          <li>Click <strong>"Delete Project"</strong> → type project name to confirm</li>
+          <li>If the project has a custom domain, <strong>remove the domain first</strong> under Settings → Domains</li>
+          <li>Locally: <code>rm -rf ~/project-name/.vercel</code></li>
+          <li>CLI alternative: <code>npx vercel remove project-name</code></li>
+        </ol>
+        <p style="font-size:11px;color:#f59e0b;margin-top:8px;">⚠️ Remember: you have projects on BOTH jonmlucia@gmail.com and structma@yahoo.com Vercel accounts</p>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Expo / EAS — Remove Project</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Go to <strong>expo.dev</strong> → Your Projects</li>
+          <li>Find the project → click the <strong>⋯</strong> menu → <strong>Delete</strong></li>
+          <li>This removes EAS Build history, update channels, and credentials</li>
+          <li>Locally: remove <code>app.json</code> expo config or the whole directory</li>
+          <li>CLI: <code>eas project:delete</code> (from the project directory)</li>
+        </ol>
+        <p style="font-size:11px;color:#f59e0b;margin-top:8px;">⚠️ If the app is on the App Store/TestFlight, removing from Expo doesn't remove it from Apple — do that separately in App Store Connect</p>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Firebase — Delete or Disable Project</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Go to <strong>console.firebase.google.com</strong></li>
+          <li>Select the project → <strong>Project Settings</strong> (gear icon)</li>
+          <li>Scroll to bottom → <strong>"Shut down project"</strong></li>
+          <li>This gives you 30 days to recover before permanent deletion</li>
+          <li>To just <strong>disable billing</strong>: Go to GCP Console → Billing → unlink the project</li>
+          <li>Locally: <code>rm .firebaserc firebase.json</code></li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Supabase — Pause or Delete Project</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Go to <strong>supabase.com/dashboard</strong></li>
+          <li>Select the project → <strong>Settings</strong> → <strong>General</strong></li>
+          <li>To <strong>pause</strong> (free, reversible): Click "Pause project" — data is preserved but APIs stop</li>
+          <li>To <strong>delete</strong> (permanent): Click "Delete project" → type name to confirm</li>
+          <li>Locally: remove <code>supabase/</code> directory and Supabase env vars from <code>.env</code></li>
+        </ol>
+        <p style="font-size:11px;color:#10b981;margin-top:8px;">💡 Pausing is free and keeps your data — good option if you might return to the project</p>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Cloudflare — Delete Worker or Pages Project</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Log in at <strong>dash.cloudflare.com</strong></li>
+          <li><strong>Workers:</strong> Workers & Pages → select worker → Settings → Delete</li>
+          <li><strong>Pages:</strong> Workers & Pages → select project → Settings → Delete</li>
+          <li><strong>D1 databases:</strong> Workers & Pages → D1 → select database → Delete (do this BEFORE deleting the worker)</li>
+          <li><strong>Custom domains:</strong> If the worker/page has a custom route, remove it from DNS first</li>
+          <li>Locally: <code>rm wrangler.toml</code> or the whole directory</li>
+          <li>CLI: <code>npx wrangler delete</code> (from the project directory)</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Netlify — Delete Site</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Go to <strong>app.netlify.com</strong></li>
+          <li>Select the site → <strong>Site configuration</strong> → scroll to bottom</li>
+          <li>Click <strong>"Delete this site"</strong> → type site name to confirm</li>
+          <li>If using a custom domain, remove it from Netlify first, then update DNS</li>
+          <li>Locally: <code>rm -rf .netlify netlify.toml</code></li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="help-section">
+      <summary>Full Project Cleanup Checklist</summary>
+      <div class="decom-steps">
+        <ol>
+          <li>Check the Account column — make sure you're logging into the right account for each service</li>
+          <li>Remove <strong>custom domains</strong> and <strong>DNS records</strong> first (Cloudflare DNS panel)</li>
+          <li>Delete from <strong>hosting services</strong> (Vercel, Netlify, Cloudflare Pages)</li>
+          <li>Delete <strong>databases</strong> (Supabase, D1, Firestore) — export data first if needed</li>
+          <li>Remove from <strong>Expo/EAS</strong> if it's a mobile app</li>
+          <li>Archive the <strong>GitHub repo</strong> (don't delete — you might want the code later)</li>
+          <li>Delete the <strong>local directory</strong> if you don't need the code</li>
+          <li>Come back here and re-scan — the project will disappear from the dashboard</li>
+          <li>Update status to "Archived" first if you want to keep a record of it</li>
+        </ol>
+      </div>
+    </details>
+  </div>
+
+  <!-- Portfolio Tab -->
+  <div class="help-tab-content" id="tab-portfolio">
+    <h3>Update Portfolio via Claude Code</h3>
+    <p>Click the <strong>"✎ Update Portfolio"</strong> button in the top bar to open a new Terminal window with Claude Code, pre-loaded with a prompt that includes your current active and archived projects.</p>
+    <p style="margin-top:10px;">Claude will:</p>
+    <ul>
+      <li>Open your portfolio project at <code>~/portfolio</code></li>
+      <li>Review what's currently shown on jonathanlucia.com</li>
+      <li>Compare against your active/archived projects from this dashboard</li>
+      <li>Suggest or make updates to feature new projects and remove old ones</li>
+    </ul>
+    <h3 style="margin-top:16px;">How It Works</h3>
+    <ul>
+      <li>The button generates a prompt from your current project data (active vs archived)</li>
+      <li>It opens a new Terminal window and runs <code>claude</code> in your portfolio directory</li>
+      <li>The prompt is saved to <code>~/project-dashboard/.portfolio-prompt.txt</code> for reference</li>
+    </ul>
+    <p style="margin-top:10px;font-size:12px;color:#64748b;">Tip: You can also copy the generated prompt and paste it into any Claude session manually.</p>
+  </div>
 </div>
 
 <!-- Filters -->
@@ -923,6 +1238,45 @@ document.getElementById('rescan-btn').addEventListener('click', async () => {
   }
   btn.textContent = '\uD83D\uDD04 Re-scan';
   btn.disabled = false;
+});
+
+// ── Help Panel ──
+document.getElementById('help-btn').addEventListener('click', () => {
+  const panel = document.getElementById('help-panel');
+  const btn = document.getElementById('help-btn');
+  panel.classList.toggle('open');
+  btn.classList.toggle('active');
+});
+
+document.querySelectorAll('.help-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.help-tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Portfolio Update ──
+document.getElementById('portfolio-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('portfolio-btn');
+  btn.textContent = '\u23F3 Generating...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/portfolio-update', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      btn.textContent = '\u2713 Opened in Terminal';
+      setTimeout(() => {
+        btn.textContent = '\u270E Update Portfolio';
+        btn.disabled = false;
+      }, 3000);
+    }
+  } catch (err) {
+    console.error('Portfolio update failed:', err);
+    btn.textContent = '\u270E Update Portfolio';
+    btn.disabled = false;
+  }
 });
 </script>
 </body>
