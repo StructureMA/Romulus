@@ -48,6 +48,97 @@
     white-space: nowrap;
   }
   .spacer { flex: 1; }
+  #search {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: #e2e8f0;
+    font-size: 13px;
+    width: 220px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #search:focus {
+    border-color: rgba(99,102,241,0.5);
+    background: rgba(255,255,255,0.07);
+  }
+  #search::placeholder { color: #475569; }
+
+  /* ── Filters ── */
+  .filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    flex-wrap: wrap;
+  }
+  .filter-pill {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    color: #94a3b8;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .filter-pill:hover { background: rgba(255,255,255,0.07); }
+  .filter-pill.active { color: #e2e8f0; }
+  .filter-pill.active[data-filter-status="all"],
+  .filter-pill.active[data-filter-type="all"] {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .filter-pill.active[data-filter-status="active"] {
+    background: rgba(16,185,129,0.15);
+    border-color: rgba(16,185,129,0.3);
+    color: #6ee7b7;
+  }
+  .filter-pill.active[data-filter-status="paused"] {
+    background: rgba(245,158,11,0.15);
+    border-color: rgba(245,158,11,0.3);
+    color: #fcd34d;
+  }
+  .filter-pill.active[data-filter-status="archived"] {
+    background: rgba(100,116,139,0.12);
+    border-color: rgba(100,116,139,0.3);
+    color: #94a3b8;
+  }
+  .filter-pill.active[data-filter-type="mobile"] {
+    background: rgba(99,102,241,0.15);
+    border-color: rgba(99,102,241,0.3);
+    color: #a5b4fc;
+  }
+  .filter-pill.active[data-filter-type="webapp"] {
+    background: rgba(6,182,212,0.15);
+    border-color: rgba(6,182,212,0.3);
+    color: #67e8f9;
+  }
+  .filter-pill.active[data-filter-type="website"] {
+    background: rgba(236,72,153,0.15);
+    border-color: rgba(236,72,153,0.3);
+    color: #f9a8d4;
+  }
+  .filter-pill.active[data-filter-type="backend"] {
+    background: rgba(245,158,11,0.15);
+    border-color: rgba(245,158,11,0.3);
+    color: #fcd34d;
+  }
+  .filter-pill.active[data-filter-type="library"] {
+    background: rgba(20,184,166,0.15);
+    border-color: rgba(20,184,166,0.3);
+    color: #5eead4;
+  }
+  .filter-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 6px;
+  }
 
   /* ── Stats Row ── */
   .stats {
@@ -103,8 +194,18 @@
     padding: 10px 12px;
     text-align: left;
     border-bottom: 2px solid rgba(255,255,255,0.08);
+    cursor: pointer;
     white-space: nowrap;
     user-select: none;
+    transition: color 0.15s;
+    position: relative;
+  }
+  thead th:hover { color: #94a3b8; }
+  thead th.sorted { color: #e2e8f0; }
+  thead th .sort-arrow {
+    font-size: 10px;
+    margin-left: 3px;
+    opacity: 0.6;
   }
   tbody tr {
     border-bottom: 1px solid rgba(255,255,255,0.04);
@@ -184,7 +285,9 @@
   @media (max-width: 768px) {
     .top-bar { flex-wrap: wrap; padding: 12px 16px; }
     .stats { padding: 8px 16px; overflow-x: auto; }
+    .filters { padding: 8px 16px; }
     .table-wrap { padding: 0 16px 16px; }
+    #search { width: 160px; }
   }
 </style>
 </head>
@@ -196,6 +299,21 @@
   <span class="badge" id="project-count">0 projects</span>
   <span class="scan-date" id="scan-date"></span>
   <div class="spacer"></div>
+  <input type="text" id="search" placeholder="&#128269; Search...">
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <span class="filter-pill active" data-filter-status="all">All</span>
+  <span class="filter-pill" data-filter-status="active">Active</span>
+  <span class="filter-pill" data-filter-status="paused">Paused</span>
+  <span class="filter-pill" data-filter-status="archived">Archived</span>
+  <div class="filter-divider"></div>
+  <span class="filter-pill" data-filter-type="mobile">&#128241; Mobile</span>
+  <span class="filter-pill" data-filter-type="webapp">&#127760; Web App</span>
+  <span class="filter-pill" data-filter-type="website">&#127968; Website</span>
+  <span class="filter-pill" data-filter-type="backend">&#9881; Backend</span>
+  <span class="filter-pill" data-filter-type="library">&#128230; Library</span>
 </div>
 
 <!-- Stats -->
@@ -223,18 +341,18 @@
   <table>
     <thead>
       <tr>
-        <th style="min-width:160px">Project</th>
-        <th style="min-width:80px">Type</th>
-        <th style="min-width:75px">Status</th>
-        <th style="min-width:60px" class="td-center">GitHub</th>
-        <th style="min-width:60px" class="td-center">Vercel</th>
-        <th style="min-width:60px" class="td-center">Expo</th>
-        <th style="min-width:60px" class="td-center">Firebase</th>
-        <th style="min-width:70px" class="td-center">Supabase</th>
-        <th style="min-width:80px" class="td-center">Cloudflare</th>
-        <th style="min-width:60px" class="td-center">Netlify</th>
-        <th style="min-width:150px">Account</th>
-        <th style="min-width:200px">Notes</th>
+        <th data-col="name" style="min-width:160px">Project</th>
+        <th data-col="type" style="min-width:80px">Type</th>
+        <th data-col="status" style="min-width:75px">Status</th>
+        <th data-col="github" style="min-width:60px" class="td-center">GitHub</th>
+        <th data-col="vercel" style="min-width:60px" class="td-center">Vercel</th>
+        <th data-col="expo" style="min-width:60px" class="td-center">Expo</th>
+        <th data-col="firebase" style="min-width:60px" class="td-center">Firebase</th>
+        <th data-col="supabase" style="min-width:70px" class="td-center">Supabase</th>
+        <th data-col="cloudflare" style="min-width:80px" class="td-center">Cloudflare</th>
+        <th data-col="netlify" style="min-width:60px" class="td-center">Netlify</th>
+        <th data-col="account" style="min-width:150px">Account</th>
+        <th data-col="notes" style="min-width:200px">Notes</th>
       </tr>
     </thead>
     <tbody id="table-body"></tbody>
@@ -245,6 +363,9 @@
 // ── State ──
 let appData = { scanDate: null, accounts: [], projects: {} };
 let userData = { accounts: [], projects: {} };
+let filters = { status: 'all', type: 'all', search: '' };
+let sortCol = 'name';
+let sortDir = 'asc';
 
 // ── Type detection ──
 const TYPE_LABELS = {
@@ -290,9 +411,69 @@ function svcHtml(val) {
   return val ? '<span class="svc-yes">&#10003;</span>' : '<span class="svc-no">&mdash;</span>';
 }
 
+// ── Get filtered + sorted entries ──
+function getEntries() {
+  let entries = Object.entries(appData.projects);
+
+  // Search
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    entries = entries.filter(([key, p]) => {
+      const notes = getProjectNotes(key);
+      return key.toLowerCase().includes(q)
+        || (p.packageName || '').toLowerCase().includes(q)
+        || notes.toLowerCase().includes(q);
+    });
+  }
+
+  // Status filter
+  if (filters.status !== 'all') {
+    entries = entries.filter(([key]) => getProjectStatus(key) === filters.status);
+  }
+
+  // Type filter
+  if (filters.type !== 'all') {
+    entries = entries.filter(([key, p]) => getProjectType(key, p) === filters.type);
+  }
+
+  // Sort
+  entries.sort((a, b) => {
+    let va, vb;
+    const [keyA, projA] = a;
+    const [keyB, projB] = b;
+
+    switch (sortCol) {
+      case 'name':    va = keyA.toLowerCase(); vb = keyB.toLowerCase(); break;
+      case 'type':    va = getProjectType(keyA, projA) || 'zzz'; vb = getProjectType(keyB, projB) || 'zzz'; break;
+      case 'status':  va = getProjectStatus(keyA) || 'zzz'; vb = getProjectStatus(keyB) || 'zzz'; break;
+      case 'notes':   va = getProjectNotes(keyA); vb = getProjectNotes(keyB); break;
+      case 'account': {
+        const aa = getProjectAccounts(keyA);
+        const ab = getProjectAccounts(keyB);
+        va = aa.default || Object.values(aa)[0] || 'zzz';
+        vb = ab.default || Object.values(ab)[0] || 'zzz';
+        break;
+      }
+      default: {
+        // Service columns
+        const svcA = projA.services?.[sortCol];
+        const svcB = projB.services?.[sortCol];
+        va = svcA ? 0 : 1;
+        vb = svcB ? 0 : 1;
+      }
+    }
+
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  return entries;
+}
+
 // ── Render ──
 function render() {
-  const entries = Object.entries(appData.projects);
+  const entries = getEntries();
 
   // Stats
   let active = 0, paused = 0, archived = 0;
@@ -313,6 +494,20 @@ function render() {
   document.getElementById('scan-date').textContent = sd
     ? 'Scanned ' + sd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' at ' + sd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     : '';
+
+  // Sort headers
+  document.querySelectorAll('thead th').forEach(th => {
+    const col = th.dataset.col;
+    th.classList.toggle('sorted', col === sortCol);
+    const existing = th.querySelector('.sort-arrow');
+    if (existing) existing.remove();
+    if (col === sortCol) {
+      const arrow = document.createElement('span');
+      arrow.className = 'sort-arrow';
+      arrow.innerHTML = sortDir === 'asc' ? '&#9650;' : '&#9660;';
+      th.appendChild(arrow);
+    }
+  });
 
   // Table body
   const tbody = document.getElementById('table-body');
@@ -401,6 +596,52 @@ async function loadData() {
 }
 
 loadData();
+
+// ── Sort ──
+function sortBy(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  render();
+}
+
+document.querySelectorAll('thead th').forEach(th => {
+  th.addEventListener('click', () => sortBy(th.dataset.col));
+});
+
+// ── Search ──
+document.getElementById('search').addEventListener('input', (e) => {
+  filters.search = e.target.value;
+  render();
+});
+
+// ── Filter pills ──
+document.querySelectorAll('.filter-pill[data-filter-status]').forEach(pill => {
+  pill.addEventListener('click', () => {
+    filters.status = pill.dataset.filterStatus;
+    document.querySelectorAll('.filter-pill[data-filter-status]').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    render();
+  });
+});
+
+document.querySelectorAll('.filter-pill[data-filter-type]').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const val = pill.dataset.filterType;
+    if (filters.type === val) {
+      filters.type = 'all';
+      document.querySelectorAll('.filter-pill[data-filter-type]').forEach(p => p.classList.remove('active'));
+    } else {
+      filters.type = val;
+      document.querySelectorAll('.filter-pill[data-filter-type]').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    }
+    render();
+  });
+});
 </script>
 </body>
 </html>
