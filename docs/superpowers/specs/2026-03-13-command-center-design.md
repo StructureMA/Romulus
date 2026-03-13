@@ -24,11 +24,11 @@ A local web dashboard that tracks all of Jonathan's projects, the services they 
 
 ### Data Separation
 
-The scanner writes `projects-data.json` with auto-detected facts (services, git remotes, package names, env var names). User annotations (status, type, notes, account assignments) live in `user-data.json` and are never touched by the scanner. The dashboard merges both at load time.
+The scanner writes `projects-data.json` with auto-detected facts (services, git remotes, package names, env var names). User annotations (status, type, notes, account assignments) live in `user-data.json` and are never touched by the scanner. The server merges both at load time: scanner data provides the base, user-data fields are overlaid per project key, with user-data winning for any shared fields. If either file is missing (e.g., first run), the server returns an empty project list gracefully.
 
 ## Scanner (scanner.mjs)
 
-Crawls first-level directories under `~/` (skipping non-project dirs like Library, Music, etc.) and detects:
+Crawls first-level directories under `~/` (skipping non-project dirs like Library, Music, etc.). For monorepo projects, also peeks one level into `apps/` and `packages/` subdirectories for service config files (e.g., `wrangler.toml`, `app.json`, `.firebaserc`). Detects:
 
 | Service | Detection Method |
 |---------|-----------------|
@@ -164,6 +164,8 @@ Single HTML file with embedded CSS and JS. No build step, no framework.
   - Notes text field
   - Per-service account dropdowns (only shown for services the project uses)
 - **Auto-save** — changes POST to `/api/save` on field blur, with a subtle "saved" indicator
+- **Re-scan loading** — shows a spinner overlay with "Scanning..." while `/api/scan` is in progress
+- **Default sort** — alphabetical by directory name on initial load
 
 ### Styling
 
