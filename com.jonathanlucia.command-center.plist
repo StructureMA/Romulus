@@ -7,17 +7,17 @@
     <key>ProgramArguments</key>
     <array>
         <string>/Users/jonathanlucia/.nvm/versions/node/v22.22.0/bin/node</string>
-        <string>/Users/jonathanlucia/project-dashboard/server.mjs</string>
+        <string>/Users/jonathanlucia/Romulus/server.mjs</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/Users/jonathanlucia/project-dashboard</string>
+    <string>/Users/jonathanlucia/Romulus</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/jonathanlucia/project-dashboard/server.log</string>
+    <string>/Users/jonathanlucia/Romulus/server.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/jonathanlucia/project-dashboard/server.log</string>
+    <string>/Users/jonathanlucia/Romulus/server.log</string>
 </dict>
 </plist>
